@@ -20,7 +20,6 @@
     "mongoose": "^5.3.14",
     "quill-image-drop-module": "^1.0.3",
     "quill-image-resize-module": "^3.0.0",
-    "scss": "^0.2.4",
     "vue": "^2.5.2",
     "vue-clock2": "^1.1.5",
     "vue-quill-editor": "^3.0.6",
