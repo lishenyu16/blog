@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-
-
     <app-header ></app-header>
     <app-nav  ></app-nav>
     <router-view /> 
@@ -13,24 +11,40 @@
   import Navigation from './components/shared/Navigation.vue'
   import Header from './components/shared/Header.vue'
   import Footer from './components/shared/Footer.vue'
-  import firebase from 'firebase'
+  import blogAPI from './services/blogAPI'
+  import axios from 'axios'
+
   export default {
-    name: 'App',
-    beforeCreate(){
-      let config = {
-        apiKey: "AIzaSyCYVVdLe4FueybYBaHr7Ke4MFKaa81VqN4",
-        authDomain: "shenyublogs.firebaseapp.com",
-        databaseURL: "https://shenyublogs.firebaseio.com",
-        projectId: "shenyublogs",
-        storageBucket: "shenyublogs.appspot.com",
-        messagingSenderId: "1024154929343"
-      };
-      firebase.initializeApp(config);
-    },
     components:{
       'app-header': Header,
       'app-nav':Navigation,
       'app-footer':Footer
+    },
+    created(){
+      this.$store.dispatch('tryAutoLogin')
+    },
+    mounted(){
+      const url = 'https://ipinfo.io/';
+      axios.get(url)
+        .then(result => {
+          const ip = result.data.ip
+          const city = result.data.city || null
+          const region = result.data.region || null
+          const country = result.data.country || null
+          const time = new Date()
+          const visitor = {ip:ip,city:city,region:region,country:country,time:time}
+
+          axios.post('http://54.193.249.19:3000/visitor',visitor)  //54.193.249.19
+            .then(result=>{
+
+            })
+            .catch(err=>{
+              console.log(err)
+            })
+        })
+        .catch(err=>{
+          console.log(err)
+        })
     }
   }
 </script>

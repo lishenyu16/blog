@@ -1,13 +1,10 @@
 <template>
     <div class="container">
-        
-    </div>
-   
+     
+    </div>   
 </template>
 <script>
-export default {
-    
-}
+
 </script>
 <style scoped>
 .container{
@@ -16,6 +13,6 @@ export default {
     justify-content: flex-start;
     align-items:center;
     margin-top:12rem;
-    min-height: calc(100vh - 17rem);
+    min-height: calc(100vh - 11rem);
 }
 </style>

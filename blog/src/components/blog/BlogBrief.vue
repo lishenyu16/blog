@@ -1,20 +1,5 @@
 <template>
-    <!-- <div class="col-md-4 hover-effect">
-        <div class="card mb-4 shadow-sm" @click="goToDetail(blog)">
-            <h3>{{blog.title}}</h3>               
-            <div class="card-body">
-                <p class="card-text" v-html="blog.brief"></p>......
-            </div>
-        </div>
-    </div>   -->
-    <!-- <div class="card hover-effect" @click="goToDetail(blog)">
-      <div class="card-body">
-        <h5 class="card-title">{{blog.title}}</h5>
-        <p class="card-text" v-html="blog.brief"></p>
-        <p class="card-text"><small class="text-muted">{{blog.title}}</small></p>
-      </div>
-    </div> -->
-    <div class="card hover-effect border-info mb-3" @click="goToDetail(blog)">
+    <div @click="goToDetail(blog)" class="card-brief">
       <div class="card-header"><h3>{{blog.title}}</h3></div>
       <div class="card-body">
         <p class="card-text" v-html="blog.brief" id="blog-brief"></p>
@@ -29,7 +14,8 @@
         methods: {
           goToDetail(blog) {
             this.$store.commit('CURRENT_BLOG',blog)
-            this.$router.push({path: "/blogdetail", query:{blog: blog}})
+
+            this.$router.push({name:'blogdetail', params: { _id: blog._id }})
           }
         },
     }
@@ -39,50 +25,55 @@
 
 <style scoped>
 #blog-brief{
-  font-size:1.2rem;
+  font-size:1rem;
 }
-.card:hover{
-  background-color: antiquewhite !important;
+.card-brief:hover {
+    background-color: #faebd7 !important;
 }
-.card{
-  border-radius: 0.8rem;
-}
-
-/* .card-text{
-  font-size:1.5rem;
-}
-
-.card:hover{
-  background-color: antiquewhite !important;
-}
-:root {
-  --jumbotron-padding-y: 3rem;
+.card-brief{
+    height:15rem;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .8rem;
+    overflow: auto;
 }
 
-.jumbotron {
-  padding-top: var(--jumbotron-padding-y);
-  padding-bottom: var(--jumbotron-padding-y);
-  margin-bottom: 0;
-  background-color: #fff;
-}
-@media (min-width: 768px) {
-  .jumbotron {
-    padding-top: calc(var(--jumbotron-padding-y) * 2);
-    padding-bottom: calc(var(--jumbotron-padding-y) * 2);
+@media  screen and (min-width: 640px) {
+  .card-brief{
+    height:12rem;
+    overflow: auto;
   }
+} 
+
+.card-header:first-child {
+    border-radius: calc(.25rem - 1px) calc(.25rem - 1px) 0 0;
 }
 
-.jumbotron p:last-child {
-  margin-bottom: 0;
+.card-header {
+    padding: .75rem 1.25rem;
+    margin-bottom: 0;
+    background-color: rgba(0,0,0,.03);
+    border-bottom: 1px solid rgba(0,0,0,.125);
 }
 
-.jumbotron-heading {
-  font-weight: 300;
+.card-body {
+    flex: 1 1 auto;
+    padding: 1.25rem;
+    text-align: left;
+    text-indent: 0.5cm;
 }
 
-.jumbotron .container {
-  max-width: 40rem;
-} */
+p {
+    margin: 0 0 1rem;
+}
 
-
+.card-text:last-child {
+    margin-bottom: 0;
+    text-align: center;
+    text-indent: 0;
+}
 </style>

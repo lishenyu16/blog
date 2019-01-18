@@ -1,30 +1,25 @@
 <template>
   <main role="main">
-      <div class="album py-5 bg-light">
-        <div class="container">
-          <div class="card-columns">
-            <blog-brief v-for="(blog,index) in blogs" :blog="blog" :key=index></blog-brief>
-            <!-- <div class="col-md-4">
-                <div class="card mb-4 shadow-sm">
-                    <h3><router-link to='/addblog'>Add Blog.</router-link></h3>               
-                </div>
-            </div> -->
-            <div class="card">
-              <div class="card-body">
-                <h3><router-link to='/addblog'>Add Blog.</router-link></h3>  
-              </div>
-            </div> 
-          </div>
+    <div class="card-columns">
+      <blog-brief v-for="(blog,index) in blogs" :blog="blog" :key="blog._id" class="card"></blog-brief>
+      <div class="card" v-if="isLoggedInAdmin">
+        <div class="add-blog">
+          <h3><router-link to='/addblog'><a>Add Blog</a></router-link></h3>  
         </div>
-      </div>
+      </div> 
+    </div>
   </main>
 </template>
 
 <script>
   import BlogBrief from './BlogBrief.vue'
+  import blogAPI from '../../services/blogAPI'
   export default {
-    created(){
-      this.$store.dispatch('initBlogs')
+    mounted(){
+      blogAPI.getBlogs().then((res)=>{
+        this.$store.dispatch('setBlogs',res.data)
+      })
+      // this.$store.dispatch('initBlogs',)
     },
     components:{
       blogBrief:BlogBrief
@@ -32,47 +27,66 @@
     computed: {
       blogs() {
         return this.$store.getters.blogs
-      }
+      },
+      isLoggedInAdmin(){
+        if(this.$store.getters.isLoggedIn && this.$store.getters.currentUser.isAdmin){
+          return true
+        }
+        return false
+      }  
     },
   }
 </script>
 
 
 <style scoped>
-main{
-  margin-top:12rem;
-  min-height: calc(100vh - 17rem);
-}
-.card-text{
-  font-size:1.5rem;
-}
-:root {
-  --jumbotron-padding-y: 3rem;
-}
 
-.jumbotron {
-  padding-top: var(--jumbotron-padding-y);
-  padding-bottom: var(--jumbotron-padding-y);
-  margin-bottom: 0;
-  background-color: #fff;
+main{
+  margin-top:8rem;
+  margin-bottom:1rem;
+  min-height: calc(100vh - 12rem);
 }
-@media (min-width: 768px) {
-  .jumbotron {
-    padding-top: calc(var(--jumbotron-padding-y) * 2);
-    padding-bottom: calc(var(--jumbotron-padding-y) * 2);
+@media  screen and (min-width: 640px) {
+  main{
+    margin-top:9rem;
   }
 }
 
-.jumbotron p:last-child {
-  margin-bottom: 0;
+.card-columns{
+  width:100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap:wrap;
+  color: #2c3e50;
 }
-
-.jumbotron-heading {
-  font-weight: 300;
+.card{
+    width:70%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    margin:1rem auto;
+    word-wrap: break-word;
+    background-color: #fff;
+    background-clip: border-box;
+    border: 1px solid rgba(0,0,0,.125);
+    border-radius: .8rem;
 }
+@media  screen and (min-width: 640px) {
+  .card{
+      width:30%;
+  }
+} 
 
-.jumbotron .container {
-  max-width: 40rem;
+.add-blog{
+  height:5rem;
+  margin:auto;
+}
+.add-blog h3{
+  margin-top:2rem;
+}
+a{
+  text-decoration: none;
 }
 
 

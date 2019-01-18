@@ -19,13 +19,13 @@ div{
     flex-direction: column;
     justify-content: flex-start;
     align-items:center;
-    margin-top:12rem;
-    min-height: calc(100vh - 17rem);
+    margin-top:8rem;
+    min-height: calc(100vh - 11rem);
 }
 .background{
     background:url('./shared/bgimage.jpg') center/cover ;
     position:fixed;
-    top: -15rem;
+    top: -11rem;
     left:0;
     width:100%;
     height:100%;

@@ -1,42 +1,56 @@
 <template>
     <div class="text-center">
         <form class="form-signin" @submit.prevent="onSubmit">
-          <!-- <img class="mb-4" src="./bootstrap-solid.svg" alt="" width="72" height="72"> -->
-          <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-          <label for="inputEmail" class="sr-only">Email address</label>
-          <input type="email" id="inputEmail" class="form-control" placeholder="Email" v-model="email" required autofocus>
-          <label for="inputPassword" class="sr-only">Password</label>
-          <input type="password" id="inputPassword" class="form-control" placeholder="Password" v-model="password" required>
-          <div class="checkbox mb-3">
-              <label>
-              <input type="checkbox" value="remember-me"> Remember me
-              </label>
+          <h2 v-if="!error">Please sign in</h2>
+          <h2 v-if="error" class='error'>Login input is incorrect!</h2>
+          <div class="credentials">
+              <label for="email">Email</label>
+              <input type="email" v-model="email" required autofocus>
+              <label for="password">Password</label>
+              <input type="password" v-model="password" required autofocus>
           </div>
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          <button class="btn-signin" type="submit" >Sign In</button>
         </form>
     </div>
 </template>
 <script>
+  import authentication from '@/services/authentication'
   export default {
     data() {
       return {
         email: '',
-        password:''
+        password:'',
+        error:false
       }
     },
     methods: {
       onSubmit () {
-        const formData = {
-          email: this.email,
-          password: this.password,
-          returnSecureToken : true
-        }
-        this.$store.dispatch('login',formData)
+        authentication.login({email:this.email,password:this.password})
+        .then((res)=>{
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('userId', res.data.userId);
+          localStorage.setItem('email', res.data.email);
+          localStorage.setItem('isAdmin', res.data.isAdmin);
+          localStorage.setItem('username', res.data.username);
+          localStorage.setItem('expirationDate', res.data.expirationDate);
+          this.$store.commit('SET_USER',{username:res.data.username,userId:res.data.userId,email:res.data.email,isAdmin:res.data.isAdmin})
+          this.$store.commit('SET_TOKEN',res.data.token)
+          
+          this.$store.dispatch('setLogoutTimer')
+          this.$router.push('/')
+        })
+        .catch((err)=>{
+          if(err.response.status==401){
+            this.error= true
+          }
+          else{//500
+            alert('An internal error occured, please try again')
+          }
+        })
       }
     },
   }
 </script>
-
 
 <style scoped>
 .text-center{
@@ -44,38 +58,39 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items:center;
-  margin-top:12rem;
-  min-height: calc(100vh - 17rem);
+  margin-top:8rem;
+  min-height: calc(100vh - 11rem);
 }
-
-
 .form-signin {
   width: 100%;
-  max-width: 330px;
   padding: 15px;
 }
-.form-signin .checkbox {
-  font-weight: 400;
+
+.credentials{
+  width:100%;
+  display:flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items:flex-start;
 }
-.form-signin .form-control {
-  position: relative;
-  box-sizing: border-box;
-  height: auto;
-  padding: 10px;
-  font-size: 16px;
+
+.credentials input{
+    padding: 0.5rem 1rem;
+    font-size: 1.25rem;
+    line-height: 1rem;
+    border-radius: 0.3rem;   
+    width:100%;
 }
-.form-signin .form-control:focus {
-  z-index: 2;
+.btn-signin{
+  padding:0.5rem;
+  margin-top:0.5rem;
+  border:0.2rem solid gray;
+  border-radius: 0.2rem;
+  background-color:paleturquoise;
 }
-.form-signin input[type="email"] {
-  margin-bottom: -1px;
-  border-bottom-right-radius: 0;
-  border-bottom-left-radius: 0;
-}
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+
+.error{
+    color:red;
 }
 
 </style>

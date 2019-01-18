@@ -1,6 +1,3 @@
-
-import * as firebase from 'firebase'
-import router from '../../router/router'
 const state = {
     blogs:[],
     blog:{}
@@ -26,57 +23,39 @@ const mutations = {
 }
 const actions = {
     addBlog({state,commit},payload){
-        console.log("payload:", payload)
-        return firebase.database().ref('blogs').push(payload)
-        .then(()=>{
-            alert('New Blog has been posted!')
-            commit('UPDATE_BLOGS',payload)
-            this.$router.replace('/blog')
-        })
-        .catch(err=>{
-            console.log(err)
-        })
+        alert('New Blog has been posted!')
+        commit('UPDATE_BLOGS',payload)
+        // return firebase.database().ref('blogs').push(payload)
+        // .then(()=>{
+        //     alert('New Blog has been posted!')
+        //     commit('UPDATE_BLOGS',payload)
+        //     this.$router.replace('/blog')
+        // })
+        // .catch(err=>{
+        //     console.log(err)
+        // })
     },
-    deleteBlog({state,commit},payload){
-        console.log("payload:",payload)
-        return firebase.database().ref('blogs').child(payload.id).remove()
-        .then(()=>{
+    // deleteBlog({state,commit},payload){
+    //     return firebase.database().ref('blogs').child(payload.id).remove()
+    //     .then(()=>{
             
-        })
-        .catch(err=>{
-            console.log(err)
-            alert('Failed to delete this blog!')
-        })
-    },
-    editBlog({state,commit},payload){
-        return firebase.database().ref('blogs').child(payload.id).update(payload)
-        .then(()=>{
-            commit('CURRENT_BLOG',payload)
-            // router.replace({path: "/blogdetail", query:{blog: payload}})
+    //     })
+    //     .catch(err=>{
+    //         console.log(err)
+    //         alert('Failed to delete this blog!')
+    //     })
+    // },
+    // editBlog({state,commit},payload){
+    //     return firebase.database().ref('blogs').child(payload.id).update(payload)
+    //     .then(()=>{
+    //         commit('CURRENT_BLOG',payload)
+    //         // router.replace({path: "/blogdetail", query:{blog: payload}})
 
-            // this.$router.push({path: "/blogdetail", query:{blog: payload}})
-        })
-    },
-
-    initBlogs({state,commit,dispatch}){
-        firebase.database().ref('blogs').once('value')
-        // firebase.database().ref('entries').once('value')
-        .then(data=>{
-            const obj = data.val()
-            const blogs =[]
-            for(let key in obj){
-                blogs.push({
-                    id:key,
-                    title:obj[key].title,
-                    brief:obj[key].brief || '',
-                    context:obj[key].context,
-                    date:obj[key].date ||'',
-                    comments:obj[key].comments || [],
-                    imgURL:obj[key].imgURL ||'',
-                })
-            }
-            state.blogs = blogs
-        })    
+    //         // this.$router.push({path: "/blogdetail", query:{blog: payload}})
+    //     })
+    // },
+    setBlogs({state,commit},blogs){
+        state.blogs = blogs
     }
 }
 const getters = {

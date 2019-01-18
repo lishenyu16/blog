@@ -1,27 +1,27 @@
 <template>
     <div class="container">
-        <div class="row title">                
+        <div class="title">                
             <input type="text" name="title" 
             v-model="title" class="title-input"
             placeholder="Please enter title here" >
         </div>
         <div class="quill">
             <quill-editor
-                v-model="context"
+                v-model="contents"
                 ref="myQuillEditor"
                 :options="editorOption"
                 @change="onEditorChange($event)"
                 >
             </quill-editor>
         </div>
-
         <div class="submit">                
-            <button class="btn btn-primary btn-lg" @click = "addBlog">Submit</button>
-        </div>           
+            <button class="btn-submit" @click = "addBlog">Save</button>
+        </div>  
     </div>
 </template>
 
 <script>
+    import blogAPI from '../../services/blogAPI'
     import hljs from 'highlight.js'
     const toolbarOptions = [
         ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
@@ -41,9 +41,11 @@
         data() {
             return {
                 title: '',
-                context:'',
+                contents:'',
                 brief:'',
-                comments:[{}],
+                // date:date,
+                comments:[],
+                imgURL:null,
                 editorOption: {
                     placeholder: '',
                     theme: 'snow',  // or 'bubble'
@@ -98,10 +100,28 @@
                 }
             },
             addBlog() {
-                const newBlog = {title:this.title,context:this.context,date:this.today,brief:this.brief,comments:this.comments}
-                this.$store.dispatch('addBlog',newBlog)
-                .then(()=>{
-                    this.$router.replace('/blog')
+                const newBlog = {title:this.title,contents:this.contents,date:this.today,brief:this.brief,comments:this.comments,imgURL:this.imgURL}
+                blogAPI.addBlog(newBlog)
+                .then((res)=>{
+                    console.log("res status: ", res.status)
+                    this.$store.dispatch('addBlog',newBlog)
+                    .then(()=>{
+                        this.$router.replace('/blog')
+                    })
+                })
+                .catch(err=>{
+                    // console.log("err message: ", err.message)
+                    // if(err.message.includes('401')){
+                    if(err.response.status==401){
+                        alert('Your authentication expired, plz login')
+                        console.log('Not authenticated operation, plz login')
+                        this.$router.replace('/login')
+                    }else if(err.response.status==403){
+                        alert('You have no authorization')
+                    }
+                    else{ //500
+                        alert('Internal error occured, please try again')
+                    }
                 })
             },
 
@@ -110,20 +130,21 @@
 </script>
 <style scoped>
 .container{
-    margin-top:12rem;
+    margin:8rem auto 1rem;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    align-items: center;
-    height:calc(100vh - 12rem - 5rem);
+    min-height: calc(100vh - 12rem);
+    overflow:auto;
 }
 .quill{
-    height:35rem;
+    height:20rem;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     border: 1px solid lightslategray;
+    margin:0.5rem;
 }
 .quill-editor{
     display: flex;
@@ -131,6 +152,7 @@
     justify-content: flex-start;
     width:100%;
     height:100%;
+    overflow: auto;
 }
 /* .ql-toolbar{
     width:100%;
@@ -144,17 +166,24 @@
     width:100%;
 } */
 .title{
-    width:88.5%;
-    margin:2rem 0 2rem 0;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    margin:0.5rem;
+    border: 1px solid #d2d2d2;
 }
 .title-input{
     width:100%;
-    font-size:2rem;
+    padding:0.5rem;
+    font-size:1rem;
 }
 .submit{
     margin-top:1rem;
+    cursor: pointer;
+}
+.btn-submit{
+    font-size: 1rem;
+    color: #fff;
+    background-color: #4aae9b;
+    border: 1px solid #4aae9b;
+    border-radius: 5px;
+    cursor: pointer;
 }
 </style>
