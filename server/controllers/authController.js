@@ -1,106 +1,92 @@
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
-const config = require('../config/config')
+const bcrypt = require('bcryptjs')
 
 //not used for now as it's buggy how to pass a user object
 function jwtSignUser (user) {
-    const ONE_WEEK = 60 * 60 * 24 * 7
-    return jwt.sign(user, config.authentication.jwtSecret, {
-      expiresIn: ONE_WEEK
+    return jwt.sign(user, 'somereallylongsecret', {
+      expiresIn: '1h'
     })
   }
 
 module.exports = {
-    register(req,res){
-        // console.log(User)
-        const user = new User(req.body.username,req.body.email,req.body.password)
-        user.save().then((result)=>{
-          res.send({username:user.username,email:user.email})
-          // res.send({
-          //   user:JSON.stringify(user),
-          //   // token:jwtSignUser(JSON.stringify(user))
-          // })
+    register(req,res,next){
+        User.findOne({email:req.body.email})
+          .then((existingUser)=>{
+            if(existingUser){
+              const error = new Error('Email already in use')
+              error.statusCode = 401
+              throw error
+            }
+            bcrypt.hash(req.body.password, 8)
+              .then((hashpassword)=>{
+                const user = new User({
+                  username:req.body.username,
+                  email:req.body.email,
+                  password:hashpassword,
+                  isAdmin:false
+                })
+                return user.save()
+              })
+              .then((result)=>{
+                res.status(200).json({userId:result._id, message:'User is created!'})
+              })
+              .catch(err => {
+                if (!err.statusCode) {
+                  err.statusCode = 500;
+                }
+                next(err);
+              }); 
+          })
+          .catch(err => {
+            if (!err.statusCode) {
+              err.statusCode = 500;
+            }
+            next(err);
+          });      
+    },
+    login (req, res,next) {
+      User.findOne({email:req.body.email})
+        .then(user=>{
+          if(user){
+            //below the order really matters ! user's entered pw must put first
+            bcrypt.compare(req.body.password,user.password)
+              .then(domatch=>{
+                if(domatch){
+                  const token = jwtSignUser({email:user.email,userId:user._id,username:user.username,isAdmin:user.isAdmin})
+                  res.status(200).json({ 
+                    token: token, 
+                    expirationDate:(new Date()).getTime() + 1000*60*60, //expired 1h later
+                    username: user.username,
+                    userId: user._id,
+                    email:user.email,
+                    isAdmin: user.isAdmin
+                   });          
+                }
+                else{
+                  return res.status(401).send({
+                    error: 'Wrong password!'
+                  })
+                }
+              })
+              .catch(err=>{
+                console.log(err)
+              })
+          }
+          else{
+            return res.status(401).send({
+              error: 'A user with this email could not be found.'
+            })
+          }
         })
         .catch(err=>{
-          console.log("err to save: ", err)
-          res.send({err:'Email already in use!'})
+          if(!err.statusCode){
+            err.statusCode = 500
+          }
+          next(err)   //passed to next middleware to handle this. Plz see app.js for more info.
         })
-
-        // User.create(req.body)
-        // .then((user)=>{
-        //     res.send({
-        //         user:user.toJSON(),
-        //         token:jwtSignUser(user.toJSON())
-        //     })
-        // })
-        // .catch(err=>{
-        //     res.send({err:'Email already in use!'})
-        // })
-
     },
-    async login (req, res) {
-        try {
-          const {email, password} = req.body
-          const user = await User.findOne({
-            where: {
-              email: email
-            }
-          })
-    
-          if (!user) {
-            return res.status(403).send({
-              error: 'The login information was incorrect'
-            })
-          }
-    
-          const isPasswordValid = await user.comparePassword(password)
-          if (!isPasswordValid) {
-            return res.status(403).send({
-              error: 'The login information was incorrect'
-            })
-          }
-    
-          const userJson = user.toJSON()
-          res.send({
-            user: userJson,
-            token: jwtSignUser(userJson)
-          })
-        } catch (err) {
-          res.status(500).send({
-            error: 'An error has occured trying to log in'
-          })
-        }
+    getProfile(req,res,next){
+      res.status(200).send({username:req.session.user.username,userId:req.session.user._id,email:req.session.user.email})
     }
-    // login(req,res,next){
-    //     const {email,password} = req.body
-    //     User.findOne({
-    //         where:{
-    //             email:email
-    //         }
-    //     })
-    //     .then((user)=>{
-    //         user.comparePassword(password)
-    //         .then((result)=>{
-    //             if(result){
-    //                 return res.send({
-    //                     user:user.toJSON(),
-    //                     token:jwtSignUser(user.toJSON())
-    //                 })
-    //             }
-    //             else{
-    //                 res.status(403).send({
-    //                     error:"The login info is incorrect!"
-    //                 })
-    //             }
-    //         })
-
-    //     })
-    //     .catch((error)=>{
-    //         return res.status(500).send({
-    //             error:"An error has occured trying to log in!"
-    //         })
-    //     })
-    //     // res.send({message:"good, I received ur login request!"})
-    // }
- 
 }

@@ -8,7 +8,7 @@ module.exports = {
       ),
       email: Joi.string().email(),
       password: Joi.string().regex(
-        new RegExp('^[a-zA-Z0-9]{8,32}$')
+        new RegExp('^[a-zA-Z0-9]{6,32}$')
       )
     }
 
@@ -23,9 +23,9 @@ module.exports = {
           break        
         case 'email':
           res.status(400).send({
-            error: 'You must provide a valid email address'
+            error: 'You must provide a valid email'
           })
-          break
+          break  
         case 'password':
           res.status(400).send({
             error: `The password provided failed to match the following rules:
@@ -40,6 +40,7 @@ module.exports = {
           res.status(400).send({
             error: 'Invalid registration information'
           })
+          break
       }
     } else {
       next()

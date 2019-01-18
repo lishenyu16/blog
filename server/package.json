@@ -10,17 +10,19 @@
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
+    "compression": "^1.7.3",
+    "connect-history-api-fallback": "^1.5.0",
+    "connect-mongodb-session": "^2.0.6",
     "cors": "^2.8.5",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.3.1",
     "joi": "^14.3.0",
     "jsonwebtoken": "^8.4.0",
     "mongodb": "^3.1.10",
+    "mongoose": "^5.4.0",
     "morgan": "^1.9.1",
-    "mysql2": "^1.6.4",
-    "nodemon": "^1.18.8",
-    "sequelize": "^4.42.0",
-    "sqlite3": "^4.0.4"
+    "nodemon": "^1.18.8"
   }
 }
