@@ -15,16 +15,18 @@ module.exports = {
       country:country,
       time:time
     })
-
-    visit.save()
-      .then(result=>{
-        res.status(201).json({
-          message:"visitor record is added",
-          visit:result
+    if(ip!='162.228.76.16'){
+      visit.save()
+        .then(result=>{
+          res.status(201).json({
+            message:"visitor record is added",
+            visit:result
+          })
         })
-      })
-      .catch(err=>{
-        console.log(err)
-      })
+        .catch(err=>{
+          console.log(err)
+        })
+    }
+
   }
 }

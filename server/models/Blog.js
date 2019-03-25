@@ -8,11 +8,11 @@ const blogSchema = new Schema({
   date:{type:String,required:true},
   //alternative way to embed comments:
   comments:[
-    {
-      // comment:{type:Object,required:false}
-      type:Object,
-      required:false
-    }
+    { type: Schema.Types.ObjectId, ref: 'BlogComment' }
+    // {
+    //   type:Object,
+    //   required:false
+    // }
   ],
   // comments:[{
   //   type:Schema.Types.ObjectId,

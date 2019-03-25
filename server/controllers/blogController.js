@@ -102,7 +102,7 @@ module.exports = {
         .then((blog)=>{
           if(!blog){
             const error = new Error('Could not find blog to edit')
-            error. statusCode = 404
+            error.statusCode = 404
             throw error  //this will exit this block and reach to out-most catch block and pass this error to it.
           }
           blog.title = updated_title
